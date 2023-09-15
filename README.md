@@ -14,4 +14,9 @@ We need a way to trigger the script. On Windows, we will use a scheduled task an
 1. Download both of the Dag-Node-Monitor.ps1 scripts
 2. Move the scripts into the c:\temp directory on your machine. If that directory does not exist, create it.
 3. Download both XML files (DAG-NODE-MONITOR-L0.xml and DAG-NODE-MONITOR-L1.xml)
-4. 
+4. Search for and open Task Scheduler:
+  - ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/29df94bb-5b12-4ca5-95c0-80dfc6daa36a)
+5. Right-click the task scheduler library, and select Import:
+  - ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/f342a787-3a92-4e99-b6b4-d9755923d633)
+
+
