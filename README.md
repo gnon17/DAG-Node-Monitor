@@ -33,11 +33,7 @@ Now we need to edit the script files so they are customized to monitor your node
 1. Download the dag-node-monitor-L0.ps1 and dag-node-monitor-L1.ps1 files from this repo.
 2. Open them in a text editor or code editor to edit. You can also right-click and choose edit if you're using Windows. There are two things you need to edit. There are variables for your node's public IP address ($nodeIP) and a variable for the Webhook URL ($discordhook). Edit these so they use your node IP and your webhook URL. Do this for both the L1 and L0 scripts. Save them when finished.
     - ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/05a63e2a-6845-4ee4-af20-b865549e9de1)
-3. 
-
-
-
-
+3. If using Windows, move the files to the c:\temp folder. If it does not exist, create it. You can save it elsewhere if you'd like to, but remember where you saved it. The template task files for Windows reference c:\temp.
 
 ### How to Monitor your Node using Windows
 We need a way to trigger the script. On Windows, we will use a scheduled task and set it to run every minute. You can set this up on multiple devices, but ideally, you want a device that is always on (e.g. - a home server or VPS if you already have one). If your device running the monitor is down, you obviously won't get alerts.
