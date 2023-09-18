@@ -33,10 +33,9 @@ There are a few things you need to do before the script will monitor your node.
 
 Now we need to edit the script files so they are customized to monitor your node and send notifications to your discord channel. 
 1. Download the dag-node-monitor-L0.ps1 and dag-node-monitor-L1.ps1 files from this repo.
-2. Open them in a text editor or code editor to edit. You can also right-click and choose edit if you're using Windows. There are two things you need to edit. There are variables for your node's public IP address ($nodeIP) and a variable for the Webhook URL ($discordhook). Edit these so they use your node IP and your webhook URL. Do this for both the L1 and L0 scripts. Save them when finished.
+2. Open them in a text editor or code editor. You can also right-click and choose edit if you're using Windows. There are two things you need to edit. There are variables for your node's public IP address ($nodeIP) and a variable for the Webhook URL ($discordhook). Edit these so they use your node IP and your webhook URL. Do this for both the L1 and L0 scripts. Save them when finished.
     - ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/05a63e2a-6845-4ee4-af20-b865549e9de1)
 3. I have the email portion commented out since PowerShell uses older legacy authentication to send email. The most secure way to use this is to use an app password. Some email providers still allow this, but others don't. Gmail and Yahoo mail allow app passwords, but only for older established accounts. New accounts are not permitted to create app passwords. If you want to use email or email to SMS, you'll need to uncomment this portion (remove the #s) and complete the necessary variables highlighted in the screenshot below.
-    - 
 4. If using Windows, move the files to the c:\temp folder. If it does not exist, create it. You can save it elsewhere if you'd like to, but remember where you saved it. The template task files for Windows reference c:\temp.
 
 ### How to Monitor your Node using Windows
@@ -90,7 +89,7 @@ The example below uses Ubuntu and cron, which is the equivalent of a Windows sch
     - $nodestate
  
  #### I received an alert that my node is not in the ready state, but I never received an alert that it's back online
- - There is likely an issue with the else statement but caught in an infinite loop. This will happen if your node's public IP is incorrect or it changed. The loop is waiting for a status change for a node IP that doesn't exist. In this case, we need to make sure our monitoring script is using the correct node IP (see "node not found" troubleshooting entry). After confirming the node IP is accurate, we need to manually terminate the task. I'm working on 
+ - There is likely an issue with the else statement but caught in an infinite loop. This will happen if your node's public IP is incorrect or it changed. The loop is waiting for a status change for a node IP that doesn't exist. In this case, we need to make sure our monitoring script is using the correct node IP (see "node not found" troubleshooting entry). After confirming the node IP is accurate, we need to manually terminate the task. I'm working on a solution for this with a timer so the script won't loop for more than 12 hours. 
  - Manually stop Windows Task. 
    - Open the task scheduler. Find your dag node monitoring scheduled tasks. Right-click each of them and select "end". The tasks will resume running on schedule after being ended.
    - ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/549235cb-e7b1-403c-a247-2689477a307a)
@@ -103,7 +102,7 @@ The example below uses Ubuntu and cron, which is the equivalent of a Windows sch
            - kill 92449
            - kill 92451
            - kill 92453
-        - The job will resume running again on schedule 
+        - The job will resume running again on schedule
 
 
 
