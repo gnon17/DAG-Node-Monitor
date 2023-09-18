@@ -90,12 +90,22 @@ The example below uses Ubuntu and cron, which is the equivalent of a Windows sch
     - $nodestate
  
  #### I received an alert that my node is not in the ready state, but I never received an alert that it's back online
- - There is likely an issue with the else statement but caught in an infinite loop. This will happen if your node's public IP is incorrect or it changed. The loop is waiting for a status change for a node IP that doesn't exist. In this case, we need to make sure our monitoring script is using the correct node IP (see "node not found" troubleshooting entry). After confirming the node IP is accurate, we need to manually terminate the task:
- - Manually stop Windows Task:
-       - Open the task scheduler. Find your dag node monitoring scheduled tasks. Right-click each of them and select "end". The tasks will resume running on schedule after being ended.
-       - ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/549235cb-e7b1-403c-a247-2689477a307a)
- - Manually Stop crontab job on Ubuntu:
-       - 
+ - There is likely an issue with the else statement but caught in an infinite loop. This will happen if your node's public IP is incorrect or it changed. The loop is waiting for a status change for a node IP that doesn't exist. In this case, we need to make sure our monitoring script is using the correct node IP (see "node not found" troubleshooting entry). After confirming the node IP is accurate, we need to manually terminate the task. I'm working on 
+ - Manually stop Windows Task. 
+   - Open the task scheduler. Find your dag node monitoring scheduled tasks. Right-click each of them and select "end". The tasks will resume running on schedule after being ended.
+   - ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/549235cb-e7b1-403c-a247-2689477a307a)
+ - Manually Stop crontab jobs on Ubuntu
+   - Use the below command to locate the PIDs that are using the script files (repeat these steps for L0 script if it's happening to both)
+       - sudo ps aux |grep "/PATH TO MONITOR SCRIPTS/Dag-Node-Monitor-L1.ps1"
+       - You'll receive output like the screenshot below. Record the PIDs
+       -  ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/fd32d38d-5fc3-4a85-8af9-0b2074c41e4c)
+       - Terminate the PIDs using the kill command for each of the PIDs:
+           - kill 92449
+           - kill 92451
+           - kill 92453
+        - The job will resume running again on schedule 
+
+
 
 
 
