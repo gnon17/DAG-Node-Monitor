@@ -2,7 +2,7 @@
 ## Monitor your Constellation Network Node with PowerShell
 
 This describes how you can monitor your node status using a PowerShell script. Instructions are below for Windows and Linux. You can even run the monitor script on your node if you'd like to. This can work on MacOS also, but I do not have a Mac and do not know the equivalent setup. At writing, the script simply detects if your node is connected to the cluster and in the "Ready" state, which is what we want. The template is configured to send a notification to a webhook URL (I use Discord), but you can use any other app that can use a webhook. Optionally, you can get email alerts or SMS alerts if your carrier still supports email to SMS. Here is a sample alert from Discord and email:
-![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/8b670a7c-e63f-4a82-9002-172bcebfb6de)
+![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/0c793e51-152f-42a7-8783-a24fa95035c8)
 ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/cd0c42f6-27c6-45be-9a03-9c852b0d4dee)
 
 ### What is the point of this? 
