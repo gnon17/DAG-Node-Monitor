@@ -3,7 +3,7 @@
 
 This describes how you can monitor your node status using a PowerShell script. Instructions are below for Windows and Linux. You can even run the monitor script on your node if you'd like to. This can work on MacOS also, but I do not have a Mac and do not know the equivalent setup. At writing, the script simply detects if your node is connected to the cluster and in the "Ready" state, which is what we want. The template is configured to send a notification to a webhook URL (I use Discord), but you can use any other app that can use a webhook. Optionally, you can get email alerts or SMS alerts if your carrier still supports email to SMS. Here is a sample alert from Discord and email:
 ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/8b670a7c-e63f-4a82-9002-172bcebfb6de)
-
+![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/953bdc06-1b23-45e4-87cb-072e1a237d88)
 
 ### What is the point of this? 
 I like trying new things with PowerShell. It also allows for more flexible notifications and can be changed or enhanced by the community. Uptime Robot is a great free tool, but it only monitors every 5 minutes and uses email notifications. Extra features cost $7 per month. I hope to continue enhancing this script to provide more details and useful notifications, but for now, it will notify you when your node goes into any state that is not "Ready" and then notify you again when it's back into the Ready state. You can set up the script on as many devices as you'd like, but any device running the monitor script will trigger an alert. So, if you have three devices monitoring, you'll end up with three separate alerts. 
@@ -50,8 +50,33 @@ We need a way to trigger the script. On Windows, we will use a scheduled task an
   - ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/93001ad6-b9cd-40d0-ba5a-2eaccbd4667a)
 7. This imports the task with the default settings. The default settings run the script every minute, won't run the script if the process is already running (important so we don't get continuous alerts), and use C:\Temp\Dag-Node-Monitor-L0.ps1 as the location for the monitoring script.  Click OK to take the default settings. You can modify these if you'd like. For example, you can change the frequency, navigate to the triggers tab and adjust the frequency.
   - ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/e0647329-a018-456f-8ed1-a7b11efead84)
-8. Repeat steps 5-7 for the L1 monitor. When finished, click Enable task history in the task scheduler. This will allow you to verify your task is running.
+8. Repeat steps 5-7 for the L1 monitor. When finished, click Enable task history in the task scheduler. This will allow you to verify your task is running on schedule.
   - ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/ed57f77e-fabc-4b9d-a27d-672aa4ebf39a)
+9. If you feel like testing the alerts against your node, you can use the following commands to leave and rejoin the L1 network - "sudo nodectl restart-p intnet-l1". This should take a minute or two and be long enough for your node to leave the L1 pool, generate an alert, and then rejoin, which should result in another alert showing your node is back online. If that command finishes too quickly, use the three commands below. You'll be disconnected from the L1 pool for 2-4 minutes, which should be enough time to generate a down alert, and then the alert that your node is back in the ready state:
+    - sudo nodectl leave -p intnet-l1 (replace intnet with your profile if its named differently)
+    - sudo nodectl stop -p intnet-l1
+    - suco nodectl restart -p intentl1
+
+### How to Monitor your Node using Linux
+The example below uses Ubuntu and cron, which is the equivalent of a Windows scheduled task. I did this on the node itself and it had no impact on resource utilization since the script requires almost no resources. As mentioned in the Windows instructions, ideally you'll want this running on a machine that's on 24/7 so you don't miss alerts.
+1. First, we need to install PowerShell. Commands are below taken from the MS Learn article here - https://learn.microsoft.com/en-us/powershell/scripting/install/install-ubuntu?view=powershell-7.3:
+    - sudo apt-get update
+    - sudo apt-get install -y wget apt-transport-https software-properties-common
+    - wget -q "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb"
+    - sudo dpkg -i packages-microsoft-prod.deb
+    - rm packages-microsoft-prod.deb
+    - sudo apt-get update
+    - sudo apt-get install -y powershell
+  2. We need upload the ps1 scripts to our linux machine. Make sure you've followed the steps in the pre-requisites so your script files are edited with your node information. You can use WinSCP for this by entering the same connection details you use to connect via SSH. Make note of the location where you copy the script files:
+    - ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/f6ec22c7-b9d2-4f47-90c2-e0aa156982e1)
+  3. Now that our script files are on our Linux machine, we need to edit the crontab file. This will execute our monitoring script on a schedule. Use the command "sudo crontab -e" to open the crontab file. Then, we need to add the below lines to the file. Make sure to use the correct path to your script files. You can view this from Winscp where it's highlighted in step 2. The below lines will run the monitoring script every minute. Using Flock will prevent the script from executing if it's already in progress. This prevents us from getting spammed with alerts every minute if the node is offline. 
+    - */1 * * * * /usr/bin/flock -n /tmp/L0nodemonitor.lockfile pwsh -File "/pathtoyourfile/Dag-Node-Monitor-L0.ps1"
+    - */1 * * * * /usr/bin/flock -n /tmp/L1nodemonitor.lockfile pwsh -File "/pathtoyourfile/Dag-Node-Monitor-L1.ps1"
+    - Here's an example screenshot:
+        - ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/c80e5a66-8646-42db-a61b-937b4bed345c)
+    
+
+
 
 
 
