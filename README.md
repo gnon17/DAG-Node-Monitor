@@ -35,7 +35,9 @@ Now we need to edit the script files so they are customized to monitor your node
 1. Download the dag-node-monitor-L0.ps1 and dag-node-monitor-L1.ps1 files from this repo.
 2. Open them in a text editor or code editor to edit. You can also right-click and choose edit if you're using Windows. There are two things you need to edit. There are variables for your node's public IP address ($nodeIP) and a variable for the Webhook URL ($discordhook). Edit these so they use your node IP and your webhook URL. Do this for both the L1 and L0 scripts. Save them when finished.
     - ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/05a63e2a-6845-4ee4-af20-b865549e9de1)
-3. If using Windows, move the files to the c:\temp folder. If it does not exist, create it. You can save it elsewhere if you'd like to, but remember where you saved it. The template task files for Windows reference c:\temp.
+3. I have the email portion commented out since PowerShell uses older legacy authentication to send email. The most secure way to use this is to use an app password. Some email providers still allow this, but others don't. Gmail and Yahoo mail allow app passwords, but only for older established accounts. New accounts are not permitted to create app passwords. If you want to use email or email to SMS, you'll need to uncomment this portion (remove the #s) and complete the necessary variables highlighted in the screenshot below.
+    - 
+4. If using Windows, move the files to the c:\temp folder. If it does not exist, create it. You can save it elsewhere if you'd like to, but remember where you saved it. The template task files for Windows reference c:\temp.
 
 ### How to Monitor your Node using Windows
 We need a way to trigger the script. On Windows, we will use a scheduled task and set it to run every minute. You can set this up on multiple devices, but ideally, you want a device that is always on (e.g. - a home server or VPS if you already have one). If your device running the monitor is down, you obviously won't get alerts.
@@ -55,7 +57,7 @@ We need a way to trigger the script. On Windows, we will use a scheduled task an
 9. If you feel like testing the alerts against your node, you can use the following commands to leave and rejoin the L1 network - "sudo nodectl restart-p intnet-l1". This should take a minute or two and be long enough for your node to leave the L1 pool, generate an alert, and then rejoin, which should result in another alert showing your node is back online. If that command finishes too quickly, use the three commands below. You'll be disconnected from the L1 pool for 2-4 minutes, which should be enough time to generate a down alert, and then the alert that your node is back in the ready state:
     - sudo nodectl leave -p intnet-l1 (replace intnet with your profile if it's named differently)
     - sudo nodectl stop -p intnet-l1
-    - suco nodectl restart -p intentl1
+    - sudo nodectl restart -p intentl1
 
 ### How to Monitor your Node using Linux
 The example below uses Ubuntu and cron, which is the equivalent of a Windows scheduled task. I did this on the node itself and it had no impact on resource utilization since the script requires almost no resources. As mentioned in the Windows instructions, ideally you'll want this running on a machine that's on 24/7 so you don't miss alerts.
@@ -69,12 +71,31 @@ The example below uses Ubuntu and cron, which is the equivalent of a Windows sch
     - sudo apt-get install -y powershell
   2. We need upload the ps1 scripts to our linux machine. Make sure you've followed the steps in the pre-requisites so your script files are edited with your node information. You can use WinSCP for this by entering the same connection details you use to connect via SSH. Make note of the location where you copy the script files:
     - ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/f6ec22c7-b9d2-4f47-90c2-e0aa156982e1)
-  3. Now that our script files are on our Linux machine, we need to edit the crontab file. This will execute our monitoring script on a schedule. Use the command "sudo crontab -e" to open the crontab file. Then, we need to add the below lines to the file. Make sure to use the correct path to your script files. You can view this from Winscp where it's highlighted in step 2. The below lines will run the monitoring script every minute. Using Flock will prevent the script from executing if it's already in progress. This prevents us from getting spammed with alerts every minute if the node is offline. 
-    - */1 * * * * /usr/bin/flock -n /tmp/L0nodemonitor.lockfile pwsh -File "/pathtoyourfile/Dag-Node-Monitor-L0.ps1"
-    - */1 * * * * /usr/bin/flock -n /tmp/L1nodemonitor.lockfile pwsh -File "/pathtoyourfile/Dag-Node-Monitor-L1.ps1"
-    - Here's an example screenshot:
-        - ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/c80e5a66-8646-42db-a61b-937b4bed345c)
-    
+  3. Now that our script files are on our Linux machine, we need to edit the crontab file. This will execute our monitoring script on a schedule. Use the command "sudo crontab -e" to open the crontab file. Then, we need to add the below lines to the file. Make sure to use the correct path to your script files. You can view this from Winscp where it's highlighted in step two. The below lines will run the monitoring script every minute. Using Flock will prevent the script from executing if it's already in progress. This prevents us from getting spammed with alerts every minute if the node is offline. 
+        -  */1 * * * * /usr/bin/flock -n /tmp/L0nodemonitor.lockfile pwsh -File "/pathtoyourfile/Dag-Node-Monitor-L0.ps1"
+        -  */1 * * * * /usr/bin/flock -n /tmp/L1nodemonitor.lockfile pwsh -File "/pathtoyourfile/Dag-Node-Monitor-L1.ps1"
+        - Here's an example screenshot:
+            - ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/c80e5a66-8646-42db-a61b-937b4bed345c)
+4. Wait a minute or two and then verify your crontab job is executing with the below command. You'll see log entries that the script is executing every minute:
+       - grep CRON /var/log/syslog
+       - ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/b7984089-29f8-4e74-8699-561c20c572b3)
+5. To test the alerts, we can quickly leave and rejoin the L1 network using the same steps in step nine of the Windows instructions
+
+### Troubleshooting Guide
+#### I am receiving "node not found" but my node is in the ready state
+- Verify your node's IP is correct in your script. You can test this by executing these commands from PowerShell. Make sure to replace your node's public IP in place of "YOUR NODE PUBLIC IP" for the $NodeIP variable. The below commands should output the correct state of your node if your node IP is correct. 
+    - $NodeIP = "YOUR NODE PUBLIC IP"
+    - $MyNode = invoke-webrequest https://nebula-apim.azure-api.net/public/dag/nodestate/integrationnet/"$NodeIP"?layer=l0 -UseBasicParsing | Select -ExpandProperty Content | Out-String -ErrorAction SilentlyContinue
+    - $nodestate = $MyNode.split(",")[-1] -replace "}"
+    - $nodestate
+ 
+ #### I received an alert that my node is not in the ready state, but I never received an alert that it's back online
+ - There is likely an issue with the else statement but caught in an infinite loop. This will happen if your node's public IP is incorrect or it changed. The loop is waiting for a status change for a node IP that doesn't exist. In this case, we need to make sure our monitoring script is using the correct node IP (see "node not found" troubleshooting entry). After confirming the node IP is accurate, we need to manually terminate the task:
+ - Manually stop Windows Task:
+       - Open the task scheduler. Find your dag node monitoring scheduled tasks. Right-click each of them and select "end". The tasks will resume running on schedule after being ended.
+       - ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/549235cb-e7b1-403c-a247-2689477a307a)
+ - Manually Stop crontab job on Ubuntu:
+       - 
 
 
 
