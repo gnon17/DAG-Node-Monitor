@@ -2,8 +2,8 @@
 ## Monitor your Constellation Network Node with PowerShell
 
 This describes how you can monitor your node status using a PowerShell script. Instructions are below for Windows and Linux. You can even run the monitor script on your node if you'd like to. This can work on MacOS also, but I do not have a Mac and do not know the equivalent setup. At writing, the script simply detects if your node is connected to the cluster and in the "Ready" state, which is what we want. The template is configured to send a notification to a webhook URL (I use Discord), but you can use any other app that can use a webhook. Optionally, you can get email alerts or SMS alerts if your carrier still supports email to SMS. Here is a sample alert from Discord and email:
-![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/0c793e51-152f-42a7-8783-a24fa95035c8)
-![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/d311ac90-c8b7-4303-9be8-1019b0eb0850)
+-  ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/0c793e51-152f-42a7-8783-a24fa95035c8)
+-  ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/d311ac90-c8b7-4303-9be8-1019b0eb0850)
 
 ### What is the point of this? 
 I like trying new things with PowerShell. It also allows for more flexible notifications and can be changed or enhanced by the community. Uptime Robot is a great free tool, but it only monitors every 5 minutes and the free tier is limited to email notifications. Extra features cost $7 per month. I hope to continue enhancing this script to provide more details and useful notifications, but for now, it will notify you when your node goes into any state that is not "Ready" and then notify you again when it's back into the Ready state. You can set up the script on as many devices as you'd like, but any device running the monitor script will trigger an alert. So, if you have three devices monitoring, you'll end up with three separate alerts. 
