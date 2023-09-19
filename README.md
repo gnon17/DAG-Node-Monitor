@@ -5,6 +5,10 @@ This describes how you can monitor your node status using a PowerShell script. I
 -  ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/0c793e51-152f-42a7-8783-a24fa95035c8)
 -  ![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/d311ac90-c8b7-4303-9be8-1019b0eb0850)
 
+*UPDATE* - 
+Notifications will now be sent everytime the node status changes. A timeout of 6 hours was also added to the script. This will prevent it from being caught in an infinite loop, but you'll receive a node down notification every six hours if your node state is not "ready"
+![image](https://github.com/gnon17/DAG-Node-Monitor/assets/105109259/4a878753-a6a7-4032-9b78-63952dae14c3)
+
 ### What is the point of this? 
 I like trying new things with PowerShell. It also allows for more flexible notifications and can be changed or enhanced by the community. Uptime Robot is a great free tool, but it only monitors every 5 minutes and the free tier is limited to email notifications. Extra features cost $7 per month. I hope to continue enhancing this script to provide more details and useful notifications, but for now, it will notify you when your node goes into any state that is not "Ready" and then notify you again when it's back into the Ready state. You can set up the script on as many devices as you'd like, but any device running the monitor script will trigger an alert. So, if you have three devices monitoring, you'll end up with three separate alerts. 
 
