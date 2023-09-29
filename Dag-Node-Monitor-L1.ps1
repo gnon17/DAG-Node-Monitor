@@ -1,11 +1,12 @@
 #Change Log:
 # 9/18/23: Added timer and timeout for 6 hours to the while loop to prevent infinite loop. Added additional check in while loop to detect status change and alert on changes between node state until node gets to Ready
 # 9/20/23: Corrected issue where Node State of "ReadyToJoin" was being incorrectly identified as "Ready"
+# 9/29/23: Added try/catch to the $MyNode variable to deal with status code 500 message when load balancer is offline
 
 #Variables - Get NodeInfo and Current State
 $NodeIP = "YOUR NODE PUBLIC IP"
 $discordhook = "YOUR WEBHOOK URL"
-$MyNode = invoke-webrequest https://nebula-apim.azure-api.net/public/dag/nodestate/integrationnet/"$NodeIP"?layer=l1 -UseBasicParsing | Select -ExpandProperty Content | Out-String -ErrorAction SilentlyContinue
+$MyNode = try { invoke-webrequest https://nebula-apim.azure-api.net/public/dag/nodestate/integrationnet/"$NodeIP"?layer=l1 -UseBasicParsing | Select -ExpandProperty Content | Out-String -ErrorAction SilentlyContinue } catch { $_.Exception.Response }
 $NodeInfo = $MyNode.split(",") -replace '[{}""]'
 $nodestate = $MyNode.split(",")[-1] -replace "}" | Out-String
 $Loop = $true
